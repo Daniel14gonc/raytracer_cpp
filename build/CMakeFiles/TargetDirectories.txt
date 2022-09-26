@@ -1,0 +1,6 @@
+/home/daniel14gc/Graficas/raytracer_cpp/build/CMakeFiles/ray.dir
+/home/daniel14gc/Graficas/raytracer_cpp/build/CMakeFiles/edit_cache.dir
+/home/daniel14gc/Graficas/raytracer_cpp/build/CMakeFiles/rebuild_cache.dir
+/home/daniel14gc/Graficas/raytracer_cpp/build/raytracer_lib/CMakeFiles/raytracer_lib.dir
+/home/daniel14gc/Graficas/raytracer_cpp/build/raytracer_lib/CMakeFiles/edit_cache.dir
+/home/daniel14gc/Graficas/raytracer_cpp/build/raytracer_lib/CMakeFiles/rebuild_cache.dir

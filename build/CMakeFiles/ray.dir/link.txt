@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/ray.dir/src/main.cpp.o -o ray  -Wl,-rpath,/home/daniel14gc/Graficas/raytracer_cpp/build/raytracer_lib raytracer_lib/libraytracer_lib.so 
