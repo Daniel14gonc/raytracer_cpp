@@ -12,4 +12,10 @@ las gráficas creadas. Si no quieres correr el script de
 shell, puedes ver la imagen renderizada en `./imagenes/`.
 
 ## RT1
-1. En la branc master, solo corre `./run.sh` y dentro la carpeta `build` encontrarás la imagen o en `./imagenes/`.
+1. En la branch master, solo corre `./run.sh` y dentro la carpeta `build` encontrarás la imagen o en `./imagenes/`.
+
+## RT2
+1. Después de clonar el repositorio tienes que cambiarte a la branch RT2 con `git checkout rt2`.
+2. Usa el comando `git cpull origin rt2`
+3. Ahora que estás en la branch polygons, solo corre `./run.sh` y dentro la carpeta `build` encontrarás la imagen.
+4. Si no se genera la imagen, tambien la puedes encontrar en la carpeta `/imagenes/`.
