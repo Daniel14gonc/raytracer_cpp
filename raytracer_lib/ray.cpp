@@ -1,18 +1,13 @@
 #include "ray.h"
+#include "light.h"
 
 RayTracer::RayTracer(int w, int h)
 {
     width = w;
     height = h;
-	backgroundColor = new unsigned char[3];
-	backgroundColor[2] = (unsigned char) (255);
-	backgroundColor[1] = (unsigned char) (255);
-	backgroundColor[0] = (unsigned char) (255); 
-
-	currentColor = new unsigned char[3];
-	currentColor[2] = (unsigned char) (0);
-	currentColor[1] = (unsigned char) (0);
-	currentColor[0] = (unsigned char) (0);
+    backgroundColor = new Color(0, 0, 0);
+    currentColor = new Color(0, 0, 0);
+    light = new Light(new Vector3(0, 0, 0), 2, new Color(255, 255, 255));
     writer = new Writer();
     startBuffer(width, height);
 
@@ -35,9 +30,10 @@ void RayTracer::clear()
 	for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
         	frameBuffer[i][j] = new unsigned char[3];
-        	frameBuffer[i][j][2] = backgroundColor[2];
-        	frameBuffer[i][j][1] = backgroundColor[1];
-        	frameBuffer[i][j][0] = backgroundColor[0];
+            unsigned char* temp = backgroundColor->getColor();
+        	frameBuffer[i][j][2] = temp[2];
+        	frameBuffer[i][j][1] = temp[1];
+        	frameBuffer[i][j][0] = temp[0];
         }
     }
 }
@@ -48,21 +44,23 @@ int RayTracer::write(string path)
     return 0;
 }
 
-void RayTracer::point(int x, int y, unsigned char* color)
+void RayTracer::point(int x, int y, Color* color)
 {
     if (x >= 0 && x < width && y >= 0 && y < height)
     {
         if (color != NULL)
         {
-            frameBuffer[y][x][0] = color[2];
-            frameBuffer[y][x][1] = color[1];
-            frameBuffer[y][x][2] = color[0];
+            unsigned char* temp = color->getColor();
+            frameBuffer[y][x][0] = temp[0];
+            frameBuffer[y][x][1] = temp[1];
+            frameBuffer[y][x][2] = temp[2];
         }
         else
         {
-            frameBuffer[y][x][0] = backgroundColor[2];
-            frameBuffer[y][x][0] = backgroundColor[1];
-            frameBuffer[y][x][0] = backgroundColor[0];
+            unsigned char* temp = backgroundColor->getColor();
+            frameBuffer[y][x][0] = temp[0];
+            frameBuffer[y][x][0] = temp[1];
+            frameBuffer[y][x][0] = temp[2];
         }
         
     }
@@ -83,31 +81,70 @@ void RayTracer::render()
             Vector3 origin(0, 0, 0);
             Vector3 d(i, j, -1);
             Vector3 dN = d.normalized();
-            unsigned char* c = castRay(origin, dN);
+            Color* c = castRay(origin, dN);
             point(x, y, c);
         }
     }
+    cout << "finish" << endl;
 }
 
-unsigned char* RayTracer::castRay(Vector3 origin, Vector3 direction)
+Color* RayTracer::castRay(Vector3 origin, Vector3 direction)
 {
-    unsigned char* color = new unsigned char[3];
-    for (Sphere s : scene)
-    {
-        if (s.rayIntersect(origin, direction))
-        {
-            return s.getColor();
-        }
-    }
+    tuple<Material*, Intersect*> tup = sceneIntersect(origin, direction);
+    Material* material = get<0>(tup);
+    Intersect* intersect = get<1>(tup);
 
-    color[0] = (unsigned char) 0;
-    color[1] = (unsigned char) 0;
-    color[2] = (unsigned char) 0;
+    if (material == NULL)
+        return backgroundColor;
 
-    return color;
+    Vector3 ligthDir = (light->getPosition() - intersect->getPoint()).normalized();
+    float diffuseIntensity = ligthDir.dot(intersect->getNormal());
+    Color temp = material->getDiffuse();
+    Color* diffuse = temp * (diffuseIntensity * material->getAlbedo()[0]);
+
+    Vector3 lightReflection = reflect(ligthDir, intersect->getNormal());
+    float reflectionIntensity = max(0, lightReflection.dot(direction));
+    float specIntensity = pow(reflectionIntensity, material->getSpec());
+    Color* specular = light->getColor() * (specIntensity * material->getAlbedo()[1] * light->getIntensity());
+   
+    return *diffuse + *specular;
 }
 
 void RayTracer::setScene(vector<Sphere> spheres)
 {
     scene = spheres;
+}
+
+tuple<Material*, Intersect*> RayTracer::sceneIntersect(Vector3 origin, Vector3 direction)
+{
+    float zBuffer = 99999.0f;
+    Material* material = NULL;
+    Intersect* intersect = NULL;
+    for (Sphere s : scene)
+    {
+        Intersect* objectIntersect = s.rayIntersect(origin, direction);
+        if (objectIntersect != NULL)
+        {
+            if (objectIntersect->getDistance() < zBuffer)
+            {
+                zBuffer = objectIntersect->getDistance();
+                material = s.getMaterial();
+                intersect = objectIntersect;
+            }
+        }
+    }
+    tuple<Material*, Intersect*> tup {material, intersect};
+    return tup;
+}
+
+Vector3 RayTracer::reflect(Vector3 I, Vector3 N)
+{
+    return (I - (N * (2 * (N.dot(I))))).normalized();
+}
+
+float RayTracer::max(float a, float b)
+{
+    if (a > b)
+        return a;
+    return b;
 }

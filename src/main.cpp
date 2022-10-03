@@ -4,9 +4,9 @@
 int main()
 {
 
-    unsigned char white[3] = {(unsigned char) 255, (unsigned char) 255, (unsigned char) 255};
-    unsigned char black[3] = {(unsigned char) 0, (unsigned char) 0, (unsigned char) 0};
-    unsigned char orange[3] = {(unsigned char) 255, (unsigned char) 102, (unsigned char) 0};
+    Color* white = new Color(255, 255, 255);
+    Color* black = new Color(0, 0, 0);
+    Color* orange = new Color(255, 102, 0);
     RayTracer r(800, 600);
     vector<Sphere> scene;
 

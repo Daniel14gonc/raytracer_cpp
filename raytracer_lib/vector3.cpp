@@ -99,6 +99,9 @@ float Vector3::length()
 
 Vector3 Vector3::normalized()
 {
+    if (length() == 0)
+        return Vector3(0, 0, 0);
+
     return *this * (1 / this->length());
 }
 

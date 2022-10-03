@@ -7,6 +7,14 @@ add_library(raytracer_lib SHARED
     sphere.cpp
     writer.h
     writer.cpp
+    color.h
+    color.cpp
+    intersect.h
+    intersect.cpp
+    light.h
+    light.cpp
+    material.h
+    material.cpp
 )
 
 target_include_directories(raytracer_lib PUBLIC
