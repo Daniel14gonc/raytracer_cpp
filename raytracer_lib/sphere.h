@@ -1,8 +1,11 @@
+#pragma once
+
 #include "vector3.h"
 #include "material.h"
+#include "shape.h"
 #include "intersect.h"
 
-class Sphere
+class Sphere : public Shape
 {
     private:
         float radius;
@@ -11,6 +14,6 @@ class Sphere
     
     public:
         Sphere(Vector3*, float, Material*);
-        Intersect* rayIntersect(Vector3, Vector3);
-        Material* getMaterial();
+        Intersect* rayIntersect(Vector3, Vector3) override;
+        Material* getMaterial() override;
 };

@@ -25,9 +25,10 @@ class RayTracer
 		Writer* writer;
 		Light* light;
 		void point(int x, int y, Color* color = NULL);
-		vector<Sphere> scene;
+		vector<Shape*> scene;
 		tuple<Material*, Intersect*> sceneIntersect(Vector3, Vector3);
 		Vector3 reflect(Vector3 I, Vector3 N);
+		Vector3 refract(Vector3 I, Vector3 N, float roi);
 		float max(float, float);
 
     public:
@@ -36,6 +37,6 @@ class RayTracer
 		void clear();
 		int write(string path = "image.bmp");
 		void render();
-		Color* castRay(Vector3 origin, Vector3 direction);
-		void setScene(vector<Sphere>);
+		Color* castRay(Vector3 origin, Vector3 direction, int recursion = 0);
+		void setScene(vector<Shape*>);
 };

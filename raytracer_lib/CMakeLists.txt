@@ -15,6 +15,11 @@ add_library(raytracer_lib SHARED
     light.cpp
     material.h
     material.cpp
+    shape.h
+    cube.h
+    cube.cpp
+    texture.h
+    texture.cpp
 )
 
 target_include_directories(raytracer_lib PUBLIC

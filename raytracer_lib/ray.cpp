@@ -1,13 +1,15 @@
 #include "ray.h"
 #include "light.h"
 
+const int MAX_RECURSION_DEPTH = 3;
+
 RayTracer::RayTracer(int w, int h)
 {
     width = w;
     height = h;
-    backgroundColor = new Color(0, 0, 0);
+    backgroundColor = new Color(0, 0, 100);
     currentColor = new Color(0, 0, 0);
-    light = new Light(new Vector3(0, 0, 0), 2, new Color(255, 255, 255));
+    light = new Light(new Vector3(-20, 20, 20), 2, new Color(255, 255, 255));
     writer = new Writer();
     startBuffer(width, height);
 
@@ -77,7 +79,7 @@ void RayTracer::render()
         for (int x = 0; x < width; x++)
         {
             float i = ((2 * (x + 0.5) / width) - 1) * ar * tana;
-            float j = (1 - (2 * (y + 0.5) / height)) * tana;
+            float j = ((2 * (y + 0.5) / height) - 1) * tana;
             Vector3 origin(0, 0, 0);
             Vector3 d(i, j, -1);
             Vector3 dN = d.normalized();
@@ -88,8 +90,11 @@ void RayTracer::render()
     cout << "finish" << endl;
 }
 
-Color* RayTracer::castRay(Vector3 origin, Vector3 direction)
+Color* RayTracer::castRay(Vector3 origin, Vector3 direction, int recursion)
 {
+    if (recursion >= MAX_RECURSION_DEPTH)
+        return backgroundColor;
+
     tuple<Material*, Intersect*> tup = sceneIntersect(origin, direction);
     Material* material = get<0>(tup);
     Intersect* intersect = get<1>(tup);
@@ -97,20 +102,69 @@ Color* RayTracer::castRay(Vector3 origin, Vector3 direction)
     if (material == NULL)
         return backgroundColor;
 
-    Vector3 ligthDir = (light->getPosition() - intersect->getPoint()).normalized();
-    float diffuseIntensity = ligthDir.dot(intersect->getNormal());
-    Color temp = material->getDiffuse();
-    Color* diffuse = temp * (diffuseIntensity * material->getAlbedo()[0]);
+    // refraction
+    Color* reflectColor;
+    if (material->getAlbedo()[2] > 0)
+    {
+        Vector3 reflectDir = reflect(direction, intersect->getNormal());
+        float reflectBias = (reflectDir.dot(intersect->getNormal()) < 0) ? -0.5 : 0.5;
+        Vector3 reflectOrig = intersect->getPoint() + intersect->getNormal() * reflectBias;
+        reflectColor = castRay(reflectOrig, reflectDir, recursion + 1);
+    }
+    else
+    {
+        reflectColor = new Color(0, 0, 0);
+    }
 
-    Vector3 lightReflection = reflect(ligthDir, intersect->getNormal());
+    Color* reflection = *reflectColor * material->getAlbedo()[2];
+
+    // refraction
+    Color* refractColor;
+    if (material->getAlbedo()[3] > 0)
+    {
+        Vector3 refractDir = refract(direction, intersect->getNormal(), material->getRefractiveIndex());
+        float refractBias = (refractDir.dot(intersect->getNormal()) < 0) ? -0.5 : 0.5;
+        Vector3 refractOrig = intersect->getPoint() + intersect->getNormal() * refractBias;
+        refractColor = castRay(refractOrig, refractDir, recursion + 1);
+    }
+    else
+    {
+        refractColor = new Color(0, 0, 0);
+    }
+
+    Color* refraction = *refractColor * material->getAlbedo()[3];
+    
+    Vector3 lightDir = (light->getPosition() - intersect->getPoint()).normalized();
+
+    float shadowBias = 1.1;
+    Vector3 shadowOrigin = intersect->getPoint() + intersect->getNormal() * shadowBias;
+    tuple<Material*, Intersect*> tupShadow = sceneIntersect(shadowOrigin, lightDir);
+    Material* shadowMaterial = get<0>(tupShadow);
+    Intersect* shadowIntersect = get<1>(tupShadow);
+
+    float shadowIntensity = 1;
+
+    if(shadowMaterial != NULL)
+        shadowIntensity = 0.5;
+
+    // diffuse
+    float diffuseIntensity = lightDir.dot(intersect->getNormal());
+    Color temp = material->getDiffuse();
+    Color* diffuse = temp * (diffuseIntensity * material->getAlbedo()[0] * shadowIntensity);
+
+    // specular
+    Vector3 lightReflection = reflect(lightDir, intersect->getNormal());
     float reflectionIntensity = max(0, lightReflection.dot(direction));
     float specIntensity = pow(reflectionIntensity, material->getSpec());
     Color* specular = light->getColor() * (specIntensity * material->getAlbedo()[1] * light->getIntensity());
    
-    return *diffuse + *specular;
+    Color* diffSpec = *diffuse + *specular;
+    Color* refractReflect = *refraction + *reflection;
+
+    return *diffSpec + *refractReflect;
 }
 
-void RayTracer::setScene(vector<Sphere> spheres)
+void RayTracer::setScene(vector<Shape*> spheres)
 {
     scene = spheres;
 }
@@ -120,19 +174,28 @@ tuple<Material*, Intersect*> RayTracer::sceneIntersect(Vector3 origin, Vector3 d
     float zBuffer = 99999.0f;
     Material* material = NULL;
     Intersect* intersect = NULL;
-    for (Sphere s : scene)
+    for (Shape* s : scene)
     {
-        Intersect* objectIntersect = s.rayIntersect(origin, direction);
+        Intersect* objectIntersect = s->rayIntersect(origin, direction);
         if (objectIntersect != NULL)
         {
-            if (objectIntersect->getDistance() < zBuffer)
+            if (objectIntersect->getDistance() > 0 && objectIntersect->getDistance() < zBuffer)
             {
                 zBuffer = objectIntersect->getDistance();
-                material = s.getMaterial();
+                material = s->getMaterial();
                 intersect = objectIntersect;
             }
         }
     }
+
+    if (material != NULL)
+    {
+        if (material->hasTexture())
+        {
+            material->changeDiffuse(*intersect);
+        }
+    }
+
     tuple<Material*, Intersect*> tup {material, intersect};
     return tup;
 }
@@ -140,6 +203,32 @@ tuple<Material*, Intersect*> RayTracer::sceneIntersect(Vector3 origin, Vector3 d
 Vector3 RayTracer::reflect(Vector3 I, Vector3 N)
 {
     return (I - (N * (2 * (N.dot(I))))).normalized();
+}
+
+Vector3 RayTracer::refract(Vector3 I, Vector3 N, float roi)
+{
+    float etai = 1;
+    float etat = roi;
+    float cosi = (I.dot(N)) * -1;
+    
+    if (cosi < 0)
+    {
+        cosi *= -1;
+        etai *= -1;
+        etat *= -1;
+        N = N * - 1;
+    }
+
+    float eta = etai / etat;
+    
+    float k = 1 - pow(eta, 2) * (1 - pow(cosi, 2));
+
+    if (k < 0)
+        return Vector3(0, 0, 0);
+    
+    float cost = pow(k, 0.5);
+
+    return ((I * eta) + (N * (eta * cosi - cost))).normalized();
 }
 
 float RayTracer::max(float a, float b)

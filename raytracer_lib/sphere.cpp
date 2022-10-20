@@ -1,5 +1,4 @@
 #include "sphere.h"
-#include "intersect.h"
 
 Sphere::Sphere(Vector3* center, float radius, Material* material)
 {
