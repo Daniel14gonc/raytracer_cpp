@@ -1,4 +1,5 @@
 #include "ray.h"
+#include "plane.h"
 #include "cube.h"
 
 
@@ -11,7 +12,7 @@ int main()
     float albedoGlass[4] = {0, 0.5, 0.1, 0.8};
     Material* glass = new Material(new Color(150, 180, 200), albedoGlass, 125, 1.5);
     float albedoMirror[4] = {0, 1, 0.8, 0};
-    Material* mirror = new Material(new Color(255, 255, 255), albedoGlass, 1425);
+    Material* mirror = new Material(new Color(255, 255, 255), albedoMirror, 1425);
     float albedoCube[4] = {0.9, 0.1, 0, 0};
     vector<Texture> textures;
     
@@ -23,9 +24,16 @@ int main()
     textures.push_back(Texture("m1.bmp"));
     Material* cube = new Material(new Color(150, 180, 200), albedoCube, 125, textures);
 
+    textures.clear();
+    textures.push_back(Texture("bush.bmp"));
+    float albedoFlower[4] = {1, 0.5, 0, 1};
+    Material* plane = new Material(new Color(150, 180, 200), albedoFlower, 125, 1, textures);
 
-    RayTracer r(800, 600);
+
+    RayTracer r(1400, 800);
     vector<Shape*> scene;
+
+    r.setEnvmap("menvmap.bmp");
 
     // Body
     Vector3* position = new Vector3(0, -1.5, -10);
@@ -36,7 +44,8 @@ int main()
     position = new Vector3(1, 1, -8);
     scene.push_back(new Sphere(position, 1.7, rubber));*/
     Vector3* center = new Vector3(0, -1.5, -10);
-    scene.push_back(new Cube(position, 2, cube));
+    // scene.push_back(new Cube(position, 2, mirror));
+    scene.push_back(new Plane(position, 4, 4, plane));
 
     r.setScene(scene);
     r.render();

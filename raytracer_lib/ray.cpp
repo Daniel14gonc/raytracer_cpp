@@ -11,8 +11,8 @@ RayTracer::RayTracer(int w, int h)
     currentColor = new Color(0, 0, 0);
     light = new Light(new Vector3(-20, 20, 20), 2, new Color(255, 255, 255));
     writer = new Writer();
+    envmap = NULL;
     startBuffer(width, height);
-
 }
 
 void RayTracer::startBuffer(int w, int h)
@@ -93,22 +93,63 @@ void RayTracer::render()
 Color* RayTracer::castRay(Vector3 origin, Vector3 direction, int recursion)
 {
     if (recursion >= MAX_RECURSION_DEPTH)
-        return backgroundColor;
+        return getBackgroundColor(direction);
 
     tuple<Material*, Intersect*> tup = sceneIntersect(origin, direction);
     Material* material = get<0>(tup);
     Intersect* intersect = get<1>(tup);
 
     if (material == NULL)
-        return backgroundColor;
+        return getBackgroundColor(direction);
+    
+    float albedoFirstValue = material->getAlbedo()[0];
+    float albedoSecondValue = material->getAlbedo()[1];
+    float albedoThirdValue = material->getAlbedo()[2];
+    float albedoFourthValue = material->getAlbedo()[3];
+
+    if (material->hasTexture())
+    {
+        if (material->getDiffuse().getR() < 245 && material->getDiffuse().getG() < 245 && material->getDiffuse().getB() < 245)
+        {
+            albedoThirdValue = 0;
+        }
+        else
+        {
+            albedoFirstValue = 0;
+        }
+    }
+
+    Vector3 lightDir = (light->getPosition() - intersect->getPoint()).normalized();
+
+    float shadowBias = 1.1;
+    Vector3 shadowOrigin = intersect->getPoint() + (intersect->getNormal() * shadowBias);
+    tuple<Material*, Intersect*> tupShadow = sceneIntersect(shadowOrigin, lightDir);
+    Material* shadowMaterial = get<0>(tupShadow);
+    Intersect* shadowIntersect = get<1>(tupShadow);
+
+    float shadowIntensity = 1;
+
+    if (shadowMaterial != NULL)
+        shadowIntensity = 0.5;
+
+    // diffuse
+    float diffuseIntensity = lightDir.dot(intersect->getNormal());
+    Color temp = material->getDiffuse();
+    Color* diffuse = temp * (diffuseIntensity * albedoFirstValue * shadowIntensity);
+
+    // specular
+    Vector3 lightReflection = reflect(lightDir, intersect->getNormal());
+    float reflectionIntensity = max(0, lightReflection.dot(direction));
+    float specIntensity = pow(reflectionIntensity, material->getSpec());
+    Color* specular = light->getColor() * (specIntensity * albedoSecondValue * light->getIntensity());
 
     // refraction
     Color* reflectColor;
-    if (material->getAlbedo()[2] > 0)
+    if (albedoThirdValue > 0)
     {
         Vector3 reflectDir = reflect(direction, intersect->getNormal());
         float reflectBias = (reflectDir.dot(intersect->getNormal()) < 0) ? -0.5 : 0.5;
-        Vector3 reflectOrig = intersect->getPoint() + intersect->getNormal() * reflectBias;
+        Vector3 reflectOrig = intersect->getPoint() + (intersect->getNormal() * reflectBias);
         reflectColor = castRay(reflectOrig, reflectDir, recursion + 1);
     }
     else
@@ -116,15 +157,15 @@ Color* RayTracer::castRay(Vector3 origin, Vector3 direction, int recursion)
         reflectColor = new Color(0, 0, 0);
     }
 
-    Color* reflection = *reflectColor * material->getAlbedo()[2];
+    Color* reflection = *reflectColor * albedoThirdValue;
 
     // refraction
     Color* refractColor;
-    if (material->getAlbedo()[3] > 0)
+    if (albedoFourthValue > 0)
     {
         Vector3 refractDir = refract(direction, intersect->getNormal(), material->getRefractiveIndex());
         float refractBias = (refractDir.dot(intersect->getNormal()) < 0) ? -0.5 : 0.5;
-        Vector3 refractOrig = intersect->getPoint() + intersect->getNormal() * refractBias;
+        Vector3 refractOrig = intersect->getPoint() + (intersect->getNormal() * refractBias);
         refractColor = castRay(refractOrig, refractDir, recursion + 1);
     }
     else
@@ -132,31 +173,7 @@ Color* RayTracer::castRay(Vector3 origin, Vector3 direction, int recursion)
         refractColor = new Color(0, 0, 0);
     }
 
-    Color* refraction = *refractColor * material->getAlbedo()[3];
-    
-    Vector3 lightDir = (light->getPosition() - intersect->getPoint()).normalized();
-
-    float shadowBias = 1.1;
-    Vector3 shadowOrigin = intersect->getPoint() + intersect->getNormal() * shadowBias;
-    tuple<Material*, Intersect*> tupShadow = sceneIntersect(shadowOrigin, lightDir);
-    Material* shadowMaterial = get<0>(tupShadow);
-    Intersect* shadowIntersect = get<1>(tupShadow);
-
-    float shadowIntensity = 1;
-
-    if(shadowMaterial != NULL)
-        shadowIntensity = 0.5;
-
-    // diffuse
-    float diffuseIntensity = lightDir.dot(intersect->getNormal());
-    Color temp = material->getDiffuse();
-    Color* diffuse = temp * (diffuseIntensity * material->getAlbedo()[0] * shadowIntensity);
-
-    // specular
-    Vector3 lightReflection = reflect(lightDir, intersect->getNormal());
-    float reflectionIntensity = max(0, lightReflection.dot(direction));
-    float specIntensity = pow(reflectionIntensity, material->getSpec());
-    Color* specular = light->getColor() * (specIntensity * material->getAlbedo()[1] * light->getIntensity());
+    Color* refraction = *refractColor * albedoFourthValue;
    
     Color* diffSpec = *diffuse + *specular;
     Color* refractReflect = *refraction + *reflection;
@@ -236,4 +253,16 @@ float RayTracer::max(float a, float b)
     if (a > b)
         return a;
     return b;
+}
+
+void RayTracer::setEnvmap(string path)
+{
+    envmap = new Envmap(path);
+}
+
+Color* RayTracer::getBackgroundColor(Vector3 direction)
+{
+    if (envmap) return envmap->getColor(direction);
+    
+    return backgroundColor;
 }

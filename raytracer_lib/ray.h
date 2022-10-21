@@ -9,6 +9,7 @@
 #include "intersect.h"
 #include <tuple>
 #include "light.h"
+#include "envmap.h"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ class RayTracer
 		int height;
 		Color* backgroundColor;
 		Color* currentColor;
+		Envmap* envmap;
 		/*unsigned char* backgroundColor;
 		unsigned char* currentColor;*/
 		unsigned char*** frameBuffer;
@@ -30,6 +32,7 @@ class RayTracer
 		Vector3 reflect(Vector3 I, Vector3 N);
 		Vector3 refract(Vector3 I, Vector3 N, float roi);
 		float max(float, float);
+		Color* getBackgroundColor(Vector3);
 
     public:
 		RayTracer(int, int);
@@ -39,4 +42,5 @@ class RayTracer
 		void render();
 		Color* castRay(Vector3 origin, Vector3 direction, int recursion = 0);
 		void setScene(vector<Shape*>);
+		void setEnvmap(string path);
 };

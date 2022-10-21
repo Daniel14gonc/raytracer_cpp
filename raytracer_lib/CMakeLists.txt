@@ -20,6 +20,10 @@ add_library(raytracer_lib SHARED
     cube.cpp
     texture.h
     texture.cpp
+    envmap.h
+    envmap.cpp
+    plane.h
+    plane.cpp
 )
 
 target_include_directories(raytracer_lib PUBLIC

@@ -88,40 +88,31 @@ Intersect* Cube::rayIntersect(Vector3 origin, Vector3 direction)
 
 Vector3* Cube::getNormal(Vector3 impact)
 {
-    cout << impact.getY() << endl;
-
     float x = impact.getX();
     float y = impact.getY();
     float z = impact.getZ();
 
-    /*float x = ceil(impact.getX() * 100) / 100.0;
-    float y = ceil(impact.getY() * 100) / 100.0;
-    float z = ceil(impact.getZ() * 100) / 100.0;*/
-    cout << x << endl;
-    cout << y << endl;
-    cout << z << endl << endl;
-
-    if(x >= min->getX() && y >= min->getY() && z == min->getZ())
+    if(x >= min->getX() && y >= min->getY() && z >= min->getZ() - 0.1 && z <= min->getZ() + 0.1)
     {
         face = 0;
         return new Vector3(0, 0, -1);
     }
-    else if(x >= min->getX() && y >= min->getY() && z == max->getZ())
+    else if(x >= min->getX() && y >= min->getY() && z >= max->getZ() - 0.1 && z <= max->getZ() + 0.1)
     {
         face = 1;
         return new Vector3(0, 0, 1);
     }
-    else if(x >= min->getX() && y == min->getY() && z >= min->getZ())
+    else if(x >= min->getX() && y >= min->getY() - 0.1 && y <= min->getY() + 0.1 && z >= min->getZ())
     {
         face = 2;
         return new Vector3(0, -1, 0);
     }
-    else if(x >= min->getX() && y == max->getY() && z >= min->getZ())
+    else if(x >= min->getX() && y >= max->getY() - 0.1 && y <= max->getY() + 0.1 && z >= min->getZ())
     {
         face = 3;
         return new Vector3(0, 1, 0);
     }
-    else if(x == min->getX() && y >= min->getY() && z >= min->getZ())
+    else if(x >= min->getX() - 0.1 && x <= min->getX() + 0.1 && y >= min->getY() && z >= min->getZ())
     {
         face = 4;
         return new Vector3(-1, 0, 0);

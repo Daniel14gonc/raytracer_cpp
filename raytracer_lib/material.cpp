@@ -71,5 +71,5 @@ void Material::setDiffuse(Intersect intersect)
 
 bool Material::hasTexture()
 {
-    return textures.size() >= 0;
+    return textures.size() > 0;
 }

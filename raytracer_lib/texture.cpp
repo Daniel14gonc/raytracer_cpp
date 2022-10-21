@@ -52,7 +52,6 @@ void Texture::read()
         pixels[y][x][0] = data[i];
         pixels[y][x][1] = data[i + 1];
         pixels[y][x][2] = data[i + 2];
-        //cout << i << endl;
         x += 1;
         if (x % width == 0)
         {
@@ -81,14 +80,9 @@ unsigned char* Texture::getColorIntensity(float tx, float ty, float intensity)
 {
     int x = (int) (tx * width);
     int y = (int) (ty * height);
-
-    /*if (x >= width) x = width - 1;
-    if (y >= height) y = height - 1;*/
     unsigned char b = (unsigned char)((float)pixels[y][x][0] * intensity);
     unsigned char g = (unsigned char)((float) pixels[y][x][1] * intensity);
     unsigned char r = (unsigned char)((float)pixels[y][x][2] * intensity);
-    // cout << (float)pixels[y][x][2] << endl;
-    // cout << (float)r << ' ' << (float)g << ' ' << (float)b << endl;
     unsigned char* color = new unsigned char[3];
     color[0] = b;
     color[1] = g;
