@@ -28,7 +28,7 @@ Intersect* Plane::rayIntersect(Vector3 origin, Vector3 direction)
 
 Vector3* Plane::getNormal(Vector3 impact)
 {
-    return new Vector3(-1, 0, 0);
+    return new Vector3(1, 0, 0);
 }
 
 Material* Plane::getMaterial()

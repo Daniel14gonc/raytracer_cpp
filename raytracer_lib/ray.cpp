@@ -9,7 +9,7 @@ RayTracer::RayTracer(int w, int h)
     height = h;
     backgroundColor = new Color(0, 0, 100);
     currentColor = new Color(0, 0, 0);
-    light = new Light(new Vector3(-20, 20, 20), 2, new Color(255, 255, 255));
+    light = new Light(new Vector3(15, 10, 20), 2, new Color(255, 255, 255));
     writer = new Writer();
     envmap = NULL;
     startBuffer(width, height);
@@ -70,7 +70,7 @@ void RayTracer::point(int x, int y, Color* color)
 
 void RayTracer::render()
 {
-    int fov = int(M_PI / 2);
+    int fov = int(M_PI / 1.5);
     float ar = (float) width / height;
     float tana = tan(fov / 2.0f);
 
@@ -107,15 +107,16 @@ Color* RayTracer::castRay(Vector3 origin, Vector3 direction, int recursion)
     float albedoThirdValue = material->getAlbedo()[2];
     float albedoFourthValue = material->getAlbedo()[3];
 
+
     if (material->hasTexture())
     {
-        if (material->getDiffuse().getR() < 245 && material->getDiffuse().getG() < 245 && material->getDiffuse().getB() < 245)
+        if (material->getDiffuse().getR() == 255 && material->getDiffuse().getG() == 255 && material->getDiffuse().getB() == 255)
         {
-            albedoThirdValue = 0;
+            albedoFirstValue = 0;
         }
         else
         {
-            albedoFirstValue = 0;
+            albedoFourthValue = 0;
         }
     }
 
@@ -143,7 +144,7 @@ Color* RayTracer::castRay(Vector3 origin, Vector3 direction, int recursion)
     float specIntensity = pow(reflectionIntensity, material->getSpec());
     Color* specular = light->getColor() * (specIntensity * albedoSecondValue * light->getIntensity());
 
-    // refraction
+    // reflection
     Color* reflectColor;
     if (albedoThirdValue > 0)
     {
