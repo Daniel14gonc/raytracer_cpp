@@ -1,16 +1,25 @@
 #include "plane.h"
 
-Plane::Plane(Vector3* center, float width,float height, Material* material)
+Plane::Plane(Vector3* center, float width,float height, Material* material, float orientation)
 {
     this->center = center;
     this->material = material;
     this->width = width;
     this->height = height;
+    this->orientation = orientation;
 }
 
 Intersect* Plane::rayIntersect(Vector3 origin, Vector3 direction)
 {
-    float d = (center->getZ() - origin.getZ()) / direction.getZ();
+    float d;
+    if (orientation == 0)
+    {
+        d = (center->getZ() - origin.getZ()) / direction.getZ();
+    }
+    else
+    {
+        d = (center->getY() - origin.getY()) / direction.getY();
+    }
     Vector3 impact = origin + (direction * d);
     Vector3* normal = getNormal(impact);
 
@@ -28,7 +37,12 @@ Intersect* Plane::rayIntersect(Vector3 origin, Vector3 direction)
 
 Vector3* Plane::getNormal(Vector3 impact)
 {
-    return new Vector3(1, 0, 0);
+    if (orientation == 0)
+    {
+        return new Vector3(1, 0, 0);
+    }
+
+    return new Vector3(0, 1, 0);
 }
 
 Material* Plane::getMaterial()

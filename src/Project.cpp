@@ -7,22 +7,8 @@ int main()
 {
     float albedoRubber[4] = {0.9, 0.1, 0, 0};
     Material* rubber = new Material(new Color(80, 0, 0), albedoRubber, 10);
-    float albedoIvory[4] = {0.695, 0.305, 0.1, 0};
-    Material* ivory = new Material(new Color(100, 100, 80), albedoIvory, 50);
     float albedoGlass[4] = {0, 0.5, 0.1, 0.8};
-    Material* glass = new Material(new Color(150, 180, 200), albedoGlass, 125, 1.5);
-    float albedoMirror[4] = {0, 1, 0.8, 0};
-    Material* mirror = new Material(new Color(255, 255, 255), albedoMirror, 1425);
-    float albedoCube[4] = {0.9, 0.1, 0, 0};
     vector<Texture> textures;
-    
-    textures.push_back(Texture("m1.bmp"));
-    textures.push_back(Texture("m1.bmp"));
-    textures.push_back(Texture("m1.bmp"));
-    textures.push_back(Texture("m2.bmp"));
-    textures.push_back(Texture("m1.bmp"));
-    textures.push_back(Texture("m1.bmp"));
-    Material* cube = new Material(new Color(150, 180, 200), albedoCube, 125, textures);
 
     textures.clear();
     textures.push_back(Texture("bush.bmp"));
@@ -30,14 +16,14 @@ int main()
     Material* bush = new Material(new Color(150, 180, 200), albedoFlower, 125, 1, textures);
 
     textures.clear();
-    textures.push_back(Texture("gold.bmp"));
-    textures.push_back(Texture("gold.bmp"));
-    textures.push_back(Texture("gold.bmp"));
-    textures.push_back(Texture("gold.bmp"));
-    textures.push_back(Texture("gold.bmp"));
-    textures.push_back(Texture("gold.bmp"));
-    float albedoGold[4] = {1.1, 0.16, 0.1, 0};
-    Material* goldCube = new Material(new Color(255, 255, 255), albedoGold, 50, textures);
+    textures.push_back(Texture("gold2.bmp"));
+    textures.push_back(Texture("gold2.bmp"));
+    textures.push_back(Texture("gold2.bmp"));
+    textures.push_back(Texture("gold2.bmp"));
+    textures.push_back(Texture("gold2.bmp"));
+    textures.push_back(Texture("gold2.bmp"));
+    float albedoGold[4] = {1.1, 0.16, 0.25, 0};
+    Material* goldCube = new Material(new Color(255, 255, 255), albedoGold, 100, textures);
 
     textures.clear();
     textures.push_back(Texture("brick.bmp"));
@@ -91,6 +77,30 @@ int main()
     textures.push_back(Texture("leaves.bmp"));
     float albedoLeaves[4] = {1, 0.5, 0, 0.8};
     Material* leaves = new Material(new Color(255, 255, 255) , albedoLeaves, 125, 1, textures);
+
+    textures.clear();
+    textures.push_back(Texture("basket.bmp"));
+    textures.push_back(Texture("basket.bmp"));
+    textures.push_back(Texture("basket.bmp"));
+    textures.push_back(Texture("basket.bmp"));
+    textures.push_back(Texture("basket.bmp"));
+    textures.push_back(Texture("basket.bmp"));
+    float albedoBasket[4] = {0.6, 0.4, 0, 0};
+    Material* basket = new Material(new Color(255, 255, 255) , albedoBasket, 125, 1, textures);
+
+    textures.clear();
+    textures.push_back(Texture("border.bmp"));
+    textures.push_back(Texture("border.bmp"));
+    textures.push_back(Texture("border.bmp"));
+    textures.push_back(Texture("border.bmp"));
+    textures.push_back(Texture("border.bmp"));
+    textures.push_back(Texture("border.bmp"));
+    float albedoBorder[4] = {0.9, 0.1, 0, 0};
+    Material* border = new Material(new Color(245, 245, 220) , albedoBorder, 125);
+
+    float albedoWater[4] = {0.6, 0.3, 0.6, 0.8};
+    Material* water = new Material(new Color(0, 0, 255), albedoWater, 1425, 1);
+
 
 
     RayTracer r(1400, 800);
@@ -218,6 +228,10 @@ int main()
     scene.push_back(new Cube(center, 1.7, brick));
     center = new Vector3(5.5, 9.5, -12);
     scene.push_back(new Cube(center, 1.7, brick));
+    center = new Vector3(6.5, 9.5, -12);
+    scene.push_back(new Cube(center, 1.7, brick));
+    center = new Vector3(8, 9.5, -12);
+    scene.push_back(new Cube(center, 1.7, brick));
 
     center = new Vector3(2.5, 10, -12);
     scene.push_back(new Cube(center, 1.7, brick));
@@ -245,7 +259,7 @@ int main()
     scene.push_back(new Cube(center, 1.5, rock));
 
     // Door
-    center = new Vector3(6.5, -0.25, -10);
+    center = new Vector3(6.5, -0.25, -11);
     scene.push_back(new Plane(center, 4, 4, door));
 
     // Tree
@@ -307,6 +321,120 @@ int main()
 
     center = new Vector3(-10.5, 7.5, -13);
     scene.push_back(new Cube(center, 1.5, leaves));
+
+    // Balloon
+    center = new Vector3(65, 7.5, -35);
+    scene.push_back(new Cube(center, 5, basket));
+
+    center = new Vector3(65, 10.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 11, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 11.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 12, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 12.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 13, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 13.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 14, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 14.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 15, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 15.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 16, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(65, 16.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+
+    center = new Vector3(69.5, 10.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 11, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 11.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 12, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 12.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 13, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 13.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 14, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 14.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 15, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 15.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 16, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 16.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 17, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(69.5, 17.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+
+    center = new Vector3(60.5, 10, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 10.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 11, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 11.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 12, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 12.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 13, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 13.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 14, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 14.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 15, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 15.5, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+    center = new Vector3(60.5, 16, -35);
+    scene.push_back(new Cube(center, 0.5, border));
+
+    center = new Vector3(66, 17, -36);
+    scene.push_back(new Cube(center, 4, rubber));
+    center = new Vector3(66, 20, -36);
+    scene.push_back(new Cube(center, 6, rubber));
+    center = new Vector3(66, 24, -36);
+    scene.push_back(new Cube(center, 10, rubber));
+    center = new Vector3(66, 30, -36);
+    scene.push_back(new Cube(center, 13, rubber));
+    center = new Vector3(66, 36, -36);
+    scene.push_back(new Cube(center, 8, rubber));
+
+    // Water
+    center = new Vector3(8, -3, -6);
+    scene.push_back(new Plane(center, 4, 6, water, 1));
+    center = new Vector3(6, -3, -7);
+    scene.push_back(new Plane(center, 4, 8, water, 1));
+    center = new Vector3(3, -3, -7);
+    scene.push_back(new Plane(center, 4, 8, water, 1));
+    center = new Vector3(0, -3, -7);
+    scene.push_back(new Plane(center, 4, 8, water, 1));
+    center = new Vector3(-3, -3, -6);
+    scene.push_back(new Plane(center, 4, 6, water, 1));
+
+
 
 
 

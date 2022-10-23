@@ -133,11 +133,11 @@ void Cube::setBoundingBox()
 {
     float minx = center->getX() - (width / 2);
     float miny = center->getY() - (width / 2);
-    float minz = center->getZ() - (width / 2);
+    float minz = center->getZ() - (width / 4);
     
     float maxx = center->getX() + (width / 2);
     float maxy = center->getY() + (width / 2);
-    float maxz = center->getZ() + (width / 2);
+    float maxz = center->getZ() + (width / 4);
     min = new Vector3(minx, miny, minz);
     max = new Vector3(maxx, maxy, maxz);
 }

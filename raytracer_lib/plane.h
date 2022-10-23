@@ -14,6 +14,7 @@ class Plane : public Shape
         float width;
         float height;
         Material* material;
+        float orientation;
         vector<Texture> textures;
         float* normalPosition(Vector3);
         float* getPosition(Vector3);
@@ -23,7 +24,7 @@ class Plane : public Shape
         Vector3* getNormal(Vector3);
 
     public:
-        Plane(Vector3*, float, float, Material*);
+        Plane(Vector3*, float, float, Material* mat, float orientation = 0);
         Intersect* rayIntersect(Vector3, Vector3) override;
         Material* getMaterial() override;
 };

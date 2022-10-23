@@ -9,7 +9,7 @@ RayTracer::RayTracer(int w, int h)
     height = h;
     backgroundColor = new Color(0, 0, 100);
     currentColor = new Color(0, 0, 0);
-    light = new Light(new Vector3(15, 10, 20), 2, new Color(255, 255, 255));
+    light = new Light(new Vector3(20, 10, 20), 2, new Color(255, 255, 255));
     writer = new Writer();
     envmap = NULL;
     startBuffer(width, height);
