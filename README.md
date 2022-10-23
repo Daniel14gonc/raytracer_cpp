@@ -16,6 +16,12 @@ shell, puedes ver la imagen renderizada en `./imagenes/`.
 
 ## RT2
 1. Después de clonar el repositorio tienes que cambiarte a la branch RT2 con `git checkout rt2`.
-2. Usa el comando `git cpull origin rt2`
+2. Usa el comando `git pull origin rt2`
+3. Ahora que estás en la branch polygons, solo corre `./run.sh` y dentro la carpeta `build` encontrarás la imagen.
+4. Si no se genera la imagen, tambien la puedes encontrar en la carpeta `/imagenes/`.
+
+## Proyecto
+1. Después de clonar el repositorio tienes que cambiarte a la branch RT2 con `git checkout project`.
+2. Usa el comando `git pull origin project`
 3. Ahora que estás en la branch polygons, solo corre `./run.sh` y dentro la carpeta `build` encontrarás la imagen.
 4. Si no se genera la imagen, tambien la puedes encontrar en la carpeta `/imagenes/`.
